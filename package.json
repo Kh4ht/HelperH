@@ -1,0 +1,19 @@
+{
+  "name": "com.kh4ht.helperh",
+  "version": "1.0.0",
+  "displayName": "HelperH",
+  "description": "Utility and Debug helper library for Unity (C#).",
+  "unity": "2021.3",
+  "author": {
+    "name": "Khaled Tamimi",
+    "email": "your_email@example.com",
+    "url": "https://github.com/Kh4ht"
+  },
+  "keywords": [
+    "unity",
+    "utilities",
+    "helper",
+    "debug",
+    "tools"
+  ]
+}
