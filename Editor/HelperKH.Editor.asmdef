@@ -1,0 +1,11 @@
+{
+  "name": "HelperKH.Editor",
+  "references": [
+    "HelperKH"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true,
+  "rootNamespace": "HelperKH"
+}
