@@ -14,7 +14,7 @@ namespace KH
         /// <typeparam name="T">The element type of the list.</typeparam>
         /// <param name="list">The list to iterate.</param>
         /// <param name="action">The action to execute for each element.</param>
-        public static void KHForEachElement<T>(this IList<T> list, Action<T> action)
+        public static void KHForEach<T>(this IList<T> list, Action<T> action)
         {
             for (int i = 0; i < list.Count; i++)
                 action(list[i]);
@@ -27,7 +27,7 @@ namespace KH
         /// <typeparam name="T">The element type of the list.</typeparam>
         /// <param name="list">The list to iterate.</param>
         /// <param name="action">The action to execute for each element, with index.</param>
-        public static void KHForEachElement<T>(this IList<T> list, Action<T, int> action)
+        public static void KHForEach<T>(this IList<T> list, Action<T, int> action)
         {
             for (int i = 0; i < list.Count; i++)
                 action(list[i], i);
@@ -44,7 +44,7 @@ namespace KH
         /// A function executed for each element.  
         /// Return <c>true</c> to continue, <c>false</c> to break the loop.
         /// </param>
-        public static void KHForEachElement<T>(this IList<T> list, Func<T, bool> action)
+        public static void KHForEach<T>(this IList<T> list, Func<T, bool> action)
         {
             for (int i = 0; i < list.Count; i++)
                 if (!action(list[i]))
@@ -63,7 +63,7 @@ namespace KH
         /// A function executed for each element and index.  
         /// Return <c>true</c> to continue, <c>false</c> to break the loop.
         /// </param>
-        public static void KHForEachElement<T>(this IList<T> list, Func<T, int, bool> action)
+        public static void KHForEach<T>(this IList<T> list, Func<T, int, bool> action)
         {
             for (int i = 0; i < list.Count; i++)
                 if (!action(list[i], i))
@@ -81,7 +81,7 @@ namespace KH
         /// <returns>
         /// The first element that satisfies the predicate, or <c>default(T)</c> if no element matches.
         /// </returns>
-        public static T KHFindElement<T>(this IList<T> list, Func<T, bool> action)
+        public static T KHFind<T>(this IList<T> list, Func<T, bool> action)
         {
             for (int i = 0; i < list.Count; i++)
             {
@@ -105,7 +105,7 @@ namespace KH
         /// <returns>
         /// The first element that satisfies the predicate, or <c>default(T)</c> if no element matches.
         /// </returns>
-        public static T KHFindElement<T>(this IList<T> list, Func<T, int, bool> action)
+        public static T KHFind<T>(this IList<T> list, Func<T, int, bool> action)
         {
             for (int i = 0; i < list.Count; i++)
             {
@@ -124,7 +124,7 @@ namespace KH
         /// <param name="list"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static List<T> KHFindAllElements<T>(this IList<T> list, Func<T, bool> action)
+        public static List<T> KHFindAll<T>(this IList<T> list, Func<T, bool> action)
         {
             List<T> resultList = new();
 
