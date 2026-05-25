@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 
 namespace KH
@@ -40,10 +41,18 @@ namespace KH
         #region  GetMousePos
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
-        /// <returns>The current mouse position.</returns>
-        public static Vector2 GetMousePos()
+        /// <returns>The current mouse position, based on main camera</returns>
+        public static Vector2 GetMouseWorldPos()
         {
-            return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (Mouse.current == null)
+                return Vector2.zero;
+
+            // Use the new Input System to get mouse position
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+
+            return Camera.main.ScreenToWorldPoint(new(mouseScreenPos.x,
+                                                      mouseScreenPos.y,
+                                                      Camera.main.nearClipPlane));
         }
 
         #endregion
@@ -215,7 +224,7 @@ namespace KH
         /// </summary>
         public static void KHMoveTowards(this Transform transform, Vector3 targetPos, float moveSpeed)
         {
-            transform.position += (Vector3)transform.position.KHDirTo(targetPos) * moveSpeed;
+            transform.position += (Vector3)transform.position.KHGetDirTo(targetPos) * moveSpeed;
         }
 
         #endregion
@@ -224,11 +233,19 @@ namespace KH
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>
-        /// A <see cref="Vector2"/> representing the direction from <paramref name="fromPos"/> to <paramref name="target"/>.
+        /// A <see cref="Vector2"/> representing the direction from <paramref name="currentPos"/> to <paramref name="targetPos"/>.
         /// </returns>
-        public static Vector2 KHDirTo(this Vector3 fromPos, Vector3 target, bool normalizeDir = true)
+        public static Vector2 KHGetDirTo(this Vector3 currentPos, Vector3 targetPos, bool normalizeDir = true)
         {
-            return (Vector2)(target - fromPos) == Vector2.zero ? Vector2.zero : normalizeDir ? (target - fromPos).normalized : (target - fromPos);
+            return (Vector2)(targetPos - currentPos) == Vector2.zero ? Vector2.zero : normalizeDir ? (targetPos - currentPos).normalized : (targetPos - currentPos);
+        }
+
+        /// <returns>
+        /// A <see cref="Vector2"/> representing the direction from <paramref name="current"/> to <paramref name="target"/>.
+        /// </returns>
+        public static Vector2 KHGetDirTo(this MonoBehaviour current, MonoBehaviour target, bool normalizeDir = true)
+        {
+            return (Vector2)(target.transform.position - current.transform.position) == Vector2.zero ? Vector2.zero : normalizeDir ? (target.transform.position - current.transform.position).normalized : (target.transform.position - current.transform.position);
         }
 
         #endregion
@@ -238,6 +255,20 @@ namespace KH
 
         public static float KHGetAngle(this Vector2 dir)
         {
+            return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        }
+
+        public static float KHGetAngle(this MonoBehaviour current, MonoBehaviour target)
+        {
+            Vector2 dir = current.KHGetDirTo(target);
+
+            return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        }
+
+        public static float KHGetAngle(this Vector3 currentPos, Vector3 targetPos)
+        {
+            Vector2 dir = currentPos.KHGetDirTo(targetPos);
+
             return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         }
 

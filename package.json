@@ -3,6 +3,9 @@
   "version": "1.0.2",
   "displayName": "HelperKH",
   "description": "A helper and utility package including UIAnimator and utility classes.",
+  "dependencies": {
+    "com.unity.inputsystem": "1.7.0"
+  },
   "unity": "2021.3",
   "author": {
     "name": "Khaled Tamimi",

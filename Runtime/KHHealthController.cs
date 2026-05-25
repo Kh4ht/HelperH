@@ -26,7 +26,7 @@ public sealed class KHHealthController : MonoBehaviour
         {
             if (_isDead == value)
                 return;
-                
+
             _isDead = value;
 
             if (_isDead)
@@ -100,7 +100,7 @@ public sealed class KHHealthController : MonoBehaviour
         // Make a copy to safely iterate
         var listenersCopy = list.ToArray();
 
-        listenersCopy.KHForEachElement(listener =>
+        listenersCopy.KHForEach(listener =>
         {
             try { listener?.Invoke(); }
             catch (Exception e) { Debug.LogError($"Listener threw exception: {e}"); }
