@@ -6,7 +6,9 @@ namespace KH
 {
     public static class LoopExtensions
     {
-        #region LIST ████████████████████████████████████████████████████████████████████████████████████
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHForEach
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
         /// Iterates through all elements in the list and executes the given action.
@@ -70,6 +72,11 @@ namespace KH
                     break;
         }
 
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHFind
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
         /// <summary>
         /// Searches for the first element in the list that matches the specified predicate.
         /// </summary>
@@ -117,6 +124,11 @@ namespace KH
             return default;
         }
 
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHFindAll
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
         /// <summary>
         /// Searches for all elements in the list that match the specified predicate and returns them as a new list.
         /// </summary>
@@ -139,8 +151,10 @@ namespace KH
         }
 
         #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHForEachChild
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
 
-        #region ForEachChild ████████████████████████████████████████████████████████████████████████████████████
         public static void KHForEachChild(this Transform transform, Action<Transform> action)
         {
             for (int i = 0; i < transform.childCount; i++)
@@ -154,6 +168,7 @@ namespace KH
                 action(transform.GetChild(i), i);
             }
         }
+
         #endregion
     }
 }

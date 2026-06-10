@@ -72,9 +72,15 @@ namespace KH
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>True if the <paramref name="list"/> is null or empty.</returns>
-        public static bool KHIsNullOrEmpty<T>(this IList<T> list)
+        public static bool KHIsEmpty<T>(this IList<T> list)
         {
-            return list == null || list.Count == 0;
+            if (list == null)
+            {
+                KHDebug.LogError($"{nameof(list)} is NULL");
+                return true;
+            }
+
+            return list.Count == 0;
         }
 
         #endregion
@@ -85,7 +91,32 @@ namespace KH
         /// <returns>A random item from a <paramref name="list"/>.</returns>
         public static T KHPickRandom<T>(this IList<T> list)
         {
-            return list.KHIsNullOrEmpty() ? default : list[Random.Range(0, list.Count)];
+            return list.KHIsEmpty() ? default : list[Random.Range(0, list.Count)];
+        }
+
+        public static List<T> KHPickRandom<T>(this IList<T> list, int count)
+        {
+            // Validate inputs
+            if (list.KHIsEmpty() || count < 1 || count > list.Count)
+            {
+                KHDebug.LogError($"Invalid parameters: list size={list?.Count ?? 0}, count={count}");
+                return new List<T>();
+            }
+
+            // Fisher-Yates shuffle - pick 'count' unique items
+            List<T> shuffled = new(list);
+
+            for (int i = 0; i < count; i++)
+            {
+                int randomIndex = Random.Range(i, shuffled.Count);
+
+                T temp = shuffled[i];
+                shuffled[i] = shuffled[randomIndex];
+                shuffled[randomIndex] = temp;
+            }
+
+            // Return the first 'count' items from shuffled list
+            return shuffled.GetRange(0, count);
         }
 
         #endregion
@@ -224,28 +255,72 @@ namespace KH
         /// </summary>
         public static void KHMoveTowards(this Transform transform, Vector3 targetPos, float moveSpeed)
         {
-            transform.position += (Vector3)transform.position.KHGetDirTo(targetPos) * moveSpeed;
+            transform.position += (Vector3)GetDir(transform.position, targetPos) * moveSpeed;
         }
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHDirTo
+        #region GetDir
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>
         /// A <see cref="Vector2"/> representing the direction from <paramref name="currentPos"/> to <paramref name="targetPos"/>.
         /// </returns>
-        public static Vector2 KHGetDirTo(this Vector3 currentPos, Vector3 targetPos, bool normalizeDir = true)
+        public static Vector2 GetDir(Vector3 currentPos, Vector3 targetPos, bool normalizeDir = true)
         {
             return (Vector2)(targetPos - currentPos) == Vector2.zero ? Vector2.zero : normalizeDir ? (targetPos - currentPos).normalized : (targetPos - currentPos);
         }
 
         /// <returns>
+        /// A <see cref="Vector2"/> representing the direction from <paramref name="currentPos"/> to <paramref name="targetPos"/>.
+        /// </returns>
+        public static Vector2 GetDir(float angle, bool normalizeDir = true)
+        {
+            return normalizeDir
+                ? (Quaternion.Euler(0, 0, angle) * Vector2.right).normalized
+                : Quaternion.Euler(0, 0, angle) * Vector2.right;
+        }
+
+        /// <returns>
         /// A <see cref="Vector2"/> representing the direction from <paramref name="current"/> to <paramref name="target"/>.
         /// </returns>
-        public static Vector2 KHGetDirTo(this MonoBehaviour current, MonoBehaviour target, bool normalizeDir = true)
+        public static Vector2 GetDir(MonoBehaviour current, MonoBehaviour target, bool normalizeDir = true)
         {
-            return (Vector2)(target.transform.position - current.transform.position) == Vector2.zero ? Vector2.zero : normalizeDir ? (target.transform.position - current.transform.position).normalized : (target.transform.position - current.transform.position);
+            if (current == null)
+            {
+                KHDebug.LogError($"{nameof(current)} is NULL");
+                return Vector2.zero;
+            }
+            if (target == null)
+            {
+                KHDebug.LogError($"{nameof(target)} is NULL");
+                return Vector2.zero;
+            }
+
+            return (Vector2)(target.transform.position - current.transform.position) == Vector2.zero
+                ? Vector2.zero
+                : normalizeDir ? (target.transform.position - current.transform.position).normalized : (target.transform.position - current.transform.position);
+        }
+
+        /// <returns>
+        /// A <see cref="Vector2"/> representing the direction from <paramref name="current"/> to <paramref name="target"/>.
+        /// </returns>
+        public static Vector2 GetDir(Transform current, Transform target, bool normalizeDir = true)
+        {
+            if (current == null)
+            {
+                KHDebug.LogError($"{nameof(current)} is NULL");
+                return Vector2.zero;
+            }
+            if (target == null)
+            {
+                KHDebug.LogError($"{nameof(target)} is NULL");
+                return Vector2.zero;
+            }
+
+            return (Vector2)(target.position - current.position) == Vector2.zero
+                ? Vector2.zero
+                : normalizeDir ? (target.position - current.position).normalized : (target.position - current.position);
         }
 
         #endregion
@@ -260,16 +335,87 @@ namespace KH
 
         public static float KHGetAngle(this MonoBehaviour current, MonoBehaviour target)
         {
-            Vector2 dir = current.KHGetDirTo(target);
+            Vector2 dir = GetDir(current, target);
 
             return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         }
 
         public static float KHGetAngle(this Vector3 currentPos, Vector3 targetPos)
         {
-            Vector2 dir = currentPos.KHGetDirTo(targetPos);
+            Vector2 dir = GetDir(currentPos, targetPos);
 
             return Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        }
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHGetAngle
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
+        public static Coroutine StartDot(
+            this MonoBehaviour runner,
+            float duration,
+            float interval,
+            System.Action onTick = null,
+            System.Action onComplete = null)
+        {
+            if (runner == null || !runner)
+                return null;
+
+            return runner.StartCoroutine(Dot(runner, duration, interval, onTick, onComplete));
+        }
+
+        private static IEnumerator Dot(
+            MonoBehaviour runner,
+            float duration,
+            float interval,
+            System.Action onTick,
+            System.Action onComplete)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                // 🔥 stop immediately if object is destroyed
+                if (!runner)
+                    yield break;
+
+                yield return new WaitForSeconds(interval);
+
+                if (!runner)
+                    yield break;
+
+                onTick?.Invoke();
+
+                elapsed += interval;
+            }
+
+            onComplete?.Invoke();
+        }
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region KHUpdateSortingOrderBasedOnYPos
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
+        /// <summary>
+        /// Updates the sprite's sorting order based on its Y position in the world.
+        /// This creates a pseudo-depth effect where objects lower on the screen
+        /// appear in front of those higher up.
+        /// 
+        /// The Y position is multiplied by 20 and cast to an integer to reduce
+        /// the frequency of sorting order changes (helps performance by avoiding
+        /// unnecessary updates for tiny movements).
+        /// 
+        /// If the calculated order differs from the last stored Y position,
+        /// the sorting order is updated and the last position is saved.
+        /// </summary>
+        public static void KHUpdateSortingOrderBasedOnYPos(this SpriteRenderer spriteRenderer, float Ypos)
+        {
+            if (spriteRenderer.sortingOrder != -(int)(Ypos * 20))
+            {
+                spriteRenderer.sortingOrder = -(int)(Ypos * 20);
+            }
         }
 
         #endregion

@@ -1,7 +1,8 @@
 {
   "name": "HelperKH",
   "references": [
-    "DOTween.Modules"
+    "DOTween.Modules",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

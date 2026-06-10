@@ -7,15 +7,17 @@ namespace KH
     public class KHTimer
     {
         private const double TIMER_MAX_VALUE = double.MaxValue - 100;
-        private double timer = 0;
+        public double Seconds { get; private set; } = 0;
+        public double Minutes => Seconds / 60;
+        public double Hours => Seconds / 3600;
 
         /// <summary>Called on Update() to run the timer</summary>
         public void Update()
         {
             // Prevents the timer from overflowing and becoming negative. The 100 is just a buffer to prevent it from getting too close to double.MaxValue, which could cause issues with the DidExceed() method.
-            if (timer < TIMER_MAX_VALUE) 
+            if (Seconds < TIMER_MAX_VALUE)
             {
-                timer += Time.deltaTime;
+                Seconds += UnityEngine.Time.deltaTime;
             }
         }
 
@@ -33,28 +35,28 @@ namespace KH
                 return false;
             }
 
-            return timer >= duration;
+            return Seconds >= duration;
         }
 
         /// <summary>
         /// Restarts the timer and optionally gives it a headstart. A headstart is a value that the timer will start at instead of 0. For example, if you want the timer to start at 0.5 seconds, you would give it a headstart of 0.5. This can be useful for things like cooldowns, where you want the timer to start at a certain point instead of 0.
         /// </summary>
         /// <param name="timerHeadstart"></param>
-        public void ResetTimer(double timerHeadstart = 0)
+        public void Reset(double timerHeadstart = 0)
         {
             if (timerHeadstart < 0)
             {
-                timer = 0;
+                Seconds = 0;
                 KHDebug.LogWarning("KHTimer.Restart() was given a negative timerHeadstart value. It has been set to 0 instead.");
             }
             else if (timerHeadstart > TIMER_MAX_VALUE)
             {
-                timer = double.MaxValue;
-                KHDebug.LogWarning("KHTimer.Restart() was given a timerHeadstart value that exceeded double.MaxValue. It has been set to double.MaxValue instead.");   
+                Seconds = double.MaxValue;
+                KHDebug.LogWarning("KHTimer.Restart() was given a timerHeadstart value that exceeded double.MaxValue. It has been set to double.MaxValue instead.");
             }
             else
             {
-                timer = 0 + timerHeadstart;
+                Seconds = 0 + timerHeadstart;
             }
         }
     }
