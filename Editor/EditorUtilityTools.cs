@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using KH;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,9 +26,10 @@ public static class EditorUtilityTools
     #region MatchCount
     // █████████████████████████████████████████████████████████████████████████████████████████████████
 
-    public static void MatchCount<T>(this List<T> list, int count)
+    public static void KHMatchCount<T>(this List<T> list, int count)
     {
-        if (list == null) return;
+        if (list == null || count < 0)
+            return;
 
         while (list.Count < count)
             list.Add(default);

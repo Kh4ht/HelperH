@@ -8,7 +8,7 @@ namespace KH
     {
         private const double TIMER_MAX_VALUE = double.MaxValue - 100;
         public double Seconds { get; private set; } = 0;
-        public double Minutes => Seconds / 60;
+        public int Minutes => (int)(Seconds / 60);
         public double Hours => Seconds / 3600;
 
         /// <summary>Called on Update() to run the timer</summary>

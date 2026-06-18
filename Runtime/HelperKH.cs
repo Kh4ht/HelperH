@@ -24,7 +24,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  GetMousePos
+        #region  CHANGE CURSOR
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>Changes the <see cref="Cursor"/> texture to a 
@@ -38,7 +38,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  GetMousePos
+        #region  GET MOUSE POS
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>The current mouse position, based on main camera</returns>
@@ -68,7 +68,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  KHIsNullOrEmpty
+        #region  IS EMPTY
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>True if the <paramref name="list"/> is null or empty.</returns>
@@ -85,7 +85,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  KHPickRandom
+        #region  PICK RANDOM
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>A random item from a <paramref name="list"/>.</returns>
@@ -121,7 +121,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  KHHasType
+        #region  HAS TYPE
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  KHDestroyAllChildrenImmediate
+        #region  DESTROY CHILDREN IMMEDIATE
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         public static void KHDestroyAllChildrenImmediate(this Transform parent)
@@ -154,7 +154,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  SqrDistance
+        #region  GET SQR DIS
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         ///<summary>for performance optimization.</summary>
@@ -247,7 +247,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHMoveTowards
+        #region MOVE TOWARDS
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region GetDir
+        #region GET DIRECTION
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>
@@ -325,7 +325,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHGetAngle
+        #region GET ANGLE
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         public static float KHGetAngle(this Vector2 dir)
@@ -349,7 +349,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHGetAngle
+        #region DOT
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         public static Coroutine StartDot(
@@ -395,7 +395,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHUpdateSortingOrderBasedOnYPos
+        #region SORTING ORDER
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -415,6 +415,45 @@ namespace KH
             if (spriteRenderer.sortingOrder != -(int)(Ypos * 20))
             {
                 spriteRenderer.sortingOrder = -(int)(Ypos * 20);
+            }
+        }
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region RUN BATCHED
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
+        public static void KHRunBatched(
+            this MonoBehaviour runner,
+            int count,
+            System.Action<int> action,
+            int batchSize = 5)
+        {
+            if (count <= batchSize)
+            {
+                for (int i = 0; i < count; i++)
+                    action(i);
+
+                return;
+            }
+
+            runner.StartCoroutine(KHRunBatchedCoroutine(
+                count,
+                batchSize,
+                action));
+        }
+
+        private static IEnumerator KHRunBatchedCoroutine(
+            int count,
+            int batchSize,
+            System.Action<int> action)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                action(i);
+
+                if ((i + 1) % batchSize == 0)
+                    yield return null;
             }
         }
 

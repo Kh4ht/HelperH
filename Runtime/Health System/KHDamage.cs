@@ -4,37 +4,25 @@ using UnityEngine;
 [Serializable]
 public struct KHDamage
 {
-    public PhysicalDmg physical;
-    public FireDmg fire;
-    public PoisonDmg poison;
+    [Tooltip("First / Instant damage dealt to target")]
+    [Min(0)] public float damage;
+
+    [Tooltip("Additional Damage Percent Of Main Damage Dealt Over Time After First Hit")]
+    [Range(0f, 1f)] public float overTimeDamagePercent;
+    [Min(0f)] public float duration, interval;
+
+    // Getters
+    public bool HasDamage => damage != 0;
+    public bool HasOvertimeDamage => duration != 0;
 
 
-    [Serializable]
-    public struct PhysicalDmg
+    public static KHDamage operator +(KHDamage a, KHDamage b)
     {
-        [Tooltip("First / Instant damage dealt to target")]
-        [Min(0)] public float damage;
-    }
+        a.damage += b.damage;
+        a.overTimeDamagePercent += b.overTimeDamagePercent;
+        a.duration += b.duration;
+        a.interval += b.interval;
 
-    [Serializable]
-    public struct FireDmg
-    {
-        [Header("FIRE")]
-        [Tooltip("First / Instant damage dealt to target")]
-        [Min(0)] public float damage;
-        [Min(0)] public float subDamage;
-        [Min(1)] public float duration;
-        [Min(0.1f)] public float interval;
-    }
-
-    [Serializable]
-    public struct PoisonDmg
-    {
-        [Header("POISON")]
-        [Tooltip("First / Instant damage dealt to target")]
-        [Min(0)] public float damage;
-        [Min(0)] public float subDamage;
-        [Min(4)] public float duration;
-        [Min(0.5f)] public float interval;
+        return a;
     }
 }

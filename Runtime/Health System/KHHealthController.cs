@@ -6,7 +6,7 @@ using UnityEngine;
 public sealed class KHHealthController
 {
     // █████████████████████████████████████████████████████████████████████████████████████████████████
-    #region FIELDS
+    #region CONSTRUCTOR
     // █████████████████████████████████████████████████████████████████████████████████████████████████
 
     public KHHealthController(MonoBehaviour owner, int newMaxHealth, float newHealth)
@@ -62,10 +62,9 @@ public sealed class KHHealthController
     public float Health
     {
         get => _health;
-        private set
+        set
         {
-            // Don't Change Health If Already Has Full Health
-            if (_health == value || (value >= _health && HasFullHealth))
+            if (IsDead || _health == value || (value >= _health && HasFullHealth))
                 return;
 
             if (_health < value)
@@ -204,7 +203,7 @@ public sealed class KHHealthController
         Notify(_onMaxHealthChangedListeners);
     }
 
-    public void StopAllDots()
+    private void StopAllDots()
     {
         foreach (Coroutine c in _activeDots)
         {
@@ -220,43 +219,23 @@ public sealed class KHHealthController
     #region PUBLIC
     // █████████████████████████████████████████████████████████████████████████████████████████████████
 
-    public void ApplyDamage(KHDamage dmg)
+    public void ApplyDamage(KHDamage khDamage)
     {
-        if (dmg.physical.damage > 0)
-            RemoveHealth(dmg.physical.damage);
+        if (!khDamage.HasDamage)
+            return;
 
-        if (dmg.fire.damage > 0)
-        {
-            RemoveHealth(dmg.fire.damage);
+        RemoveHealth(khDamage.damage);
 
-            if (!_owner || IsDead)
-                return;
+        if (!_owner || IsDead || !khDamage.HasOvertimeDamage)
+            return;
 
-            Coroutine c = null;
+        Coroutine c = null;
 
-            c = _owner.StartDot(dmg.fire.duration,
-                            dmg.fire.interval,
-                            () => RemoveHealth(dmg.fire.subDamage),
-                            () => _activeDots.Remove(c));
-            _activeDots.Add(c);
-        }
-
-        if (dmg.poison.damage > 0)
-        {
-            RemoveHealth(dmg.poison.damage);
-
-            if (!_owner || IsDead)
-                return;
-
-            Coroutine c = null;
-
-            c = _owner.StartDot(dmg.poison.duration,
-                            dmg.poison.interval,
-                            () => RemoveHealth(dmg.poison.subDamage),
-                            () => _activeDots.Remove(c));
-
-            _activeDots.Add(c);
-        }
+        c = _owner.StartDot(duration: khDamage.duration,
+                            interval: khDamage.interval,
+                            onTick: () => RemoveHealth(khDamage.damage * Mathf.Clamp01(khDamage.overTimeDamagePercent)),
+                            onComplete: () => _activeDots.Remove(c));
+        _activeDots.Add(c);
     }
 
     /// <summary>
@@ -335,6 +314,8 @@ public sealed class KHHealthController
     {
         if (!IsDead)
             return;
+
+        IsDead = false;
 
         Health = _maxHealth * Mathf.Clamp(percent, 0.01f, 1);
     }

@@ -7,7 +7,7 @@ namespace KH
     public static class LoopExtensions
     {
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHForEach
+        #region For Each
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHFind
+        #region Find
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHFindAll
+        #region Find All
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
@@ -142,17 +142,91 @@ namespace KH
 
             for (int i = 0; i < list.Count; i++)
             {
-                bool result = action(list[i]);
-                if (result)
+                if (action(list[i]))
                     resultList.Add(list[i]);
             }
 
             return resultList;
         }
 
+        /// <summary>
+        /// Returns a new dictionary containing all key-value pairs that match the specified predicate.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
+        /// <typeparam name="TValue">The type of the dictionary values.</typeparam>
+        /// <param name="dictionary">The dictionary to search.</param>
+        /// <param name="predicate">The condition used to determine which pairs to include.</param>
+        /// <returns>
+        /// A new dictionary containing all matching key-value pairs.
+        /// </returns>
+        public static Dictionary<TKey, TValue> KHFindAll<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary,
+            Func<TKey, TValue, bool> predicate)
+        {
+            Dictionary<TKey, TValue> result = new();
+
+            foreach (var pair in dictionary)
+            {
+                if (predicate(pair.Key, pair.Value))
+                    result.Add(pair.Key, pair.Value);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a list containing all keys whose key-value pairs match the specified predicate.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
+        /// <typeparam name="TValue">The type of the dictionary values.</typeparam>
+        /// <param name="dictionary">The dictionary to search.</param>
+        /// <param name="predicate">The condition used to determine which keys to include.</param>
+        /// <returns>
+        /// A list containing all matching keys.
+        /// </returns>
+        public static List<TKey> KHFindAllKeys<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary,
+            Func<TKey, TValue, bool> predicate)
+        {
+            List<TKey> result = new();
+
+            foreach (var pair in dictionary)
+            {
+                if (predicate(pair.Key, pair.Value))
+                    result.Add(pair.Key);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns a list containing all values whose key-value pairs match the specified predicate.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the dictionary keys.</typeparam>
+        /// <typeparam name="TValue">The type of the dictionary values.</typeparam>
+        /// <param name="dictionary">The dictionary to search.</param>
+        /// <param name="predicate">The condition used to determine which values to include.</param>
+        /// <returns>
+        /// A list containing all matching values.
+        /// </returns>
+        public static List<TValue> KHFindAllValues<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary,
+            Func<TKey, TValue, bool> predicate)
+        {
+            List<TValue> result = new();
+
+            foreach (var pair in dictionary)
+            {
+                if (predicate(pair.Key, pair.Value))
+                    result.Add(pair.Value);
+            }
+
+            return result;
+        }
+
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region KHForEachChild
+        #region For Each Child
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         public static void KHForEachChild(this Transform transform, Action<Transform> action)
