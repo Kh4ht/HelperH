@@ -1,15 +1,29 @@
 using System;
-using UnityEngine;
 
 namespace KH
 {
     [Serializable]
     public class KHTimer
     {
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region FIELDS
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+
+        // PRIVATE
         private const double TIMER_MAX_VALUE = double.MaxValue - 100;
+
+        // TIMER
         public double Seconds { get; private set; } = 0;
+
+        // GETTERS
+        public double SecondsNormalized => Seconds % 60;
         public int Minutes => (int)(Seconds / 60);
         public double Hours => Seconds / 3600;
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region UPDATE
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>Called on Update() to run the timer</summary>
         public void Update()
@@ -20,6 +34,11 @@ namespace KH
                 Seconds += UnityEngine.Time.deltaTime;
             }
         }
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region DID EXCEED
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <returns>True: if the timer exceeded the <paramref name="duration"/></returns>
         public bool DidExceed(double duration)
@@ -37,6 +56,11 @@ namespace KH
 
             return Seconds >= duration;
         }
+
+        #endregion
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
+        #region RESET
+        // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         /// <summary>
         /// Restarts the timer and optionally gives it a headstart. A headstart is a value that the timer will start at instead of 0. For example, if you want the timer to start at 0.5 seconds, you would give it a headstart of 0.5. This can be useful for things like cooldowns, where you want the timer to start at a certain point instead of 0.
@@ -59,5 +83,7 @@ namespace KH
                 Seconds = 0 + timerHeadstart;
             }
         }
+
+        #endregion
     }
 }
