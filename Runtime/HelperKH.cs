@@ -154,7 +154,7 @@ namespace KH
 
         #endregion
         // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  GET SQR DIS
+        #region  SQUARE DISTANCE
         // █████████████████████████████████████████████████████████████████████████████████████████████████
 
         ///<summary>for performance optimization.</summary>
@@ -216,11 +216,6 @@ namespace KH
             return (a.transform.position - b.transform.position).sqrMagnitude;
         }
 
-        #endregion
-        // █████████████████████████████████████████████████████████████████████████████████████████████████
-        #region  SqrDistanceIsLessThan
-        // █████████████████████████████████████████████████████████████████████████████████████████████████
-
         ///<summary>for performance optimization.</summary>
         /// <returns>True if the distance between <paramref name="a"/> and <paramref name="b"/>
         /// is less than the <paramref name="threshold"/>.</returns>
@@ -243,6 +238,11 @@ namespace KH
         public static bool SqrDistanceIsLessThan(MonoBehaviour a, MonoBehaviour b, float threshold)
         {
             return SqrDistance(a, b) <= threshold * threshold;
+        }
+
+        public static bool SqrDistanceIsLessThan(float dis, float threshold)
+        {
+            return dis <= threshold * threshold;
         }
 
         #endregion
